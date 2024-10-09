@@ -1,0 +1,395 @@
+diff --git a/backend/grails-app/conf/application.yml b/backend/grails-app/conf/application.yml
+index 1df80d9..2137b76 100644
+--- a/backend/grails-app/conf/application.yml
++++ b/backend/grails-app/conf/application.yml
+@@ -1,5 +1,13 @@
+ ---
+ grails:
++    cors:
++        enabled: true
++        allowedOrigins:
++            - 'http://localhost:4200'
++        allowedMethods:
++            - GET
++        allowedHeaders:
++            - '*'
+     profile: web
+     codegen:
+         defaultPackage: backend
+diff --git a/backend/grails-app/controllers/backend/CompanyController.groovy b/backend/grails-app/controllers/backend/CompanyController.groovy
+new file mode 100644
+index 0000000..9de0db2
+--- /dev/null
++++ b/backend/grails-app/controllers/backend/CompanyController.groovy
+@@ -0,0 +1,12 @@
++package backend
++
++import grails.converters.JSON
++
++class CompanyController {
++
++    CompanyService companyService
++
++    def index() {
++        render companyService.getCompanies() as JSON
++    }
++}
+diff --git a/backend/grails-app/domain/backend/Company.groovy b/backend/grails-app/domain/backend/Company.groovy
+new file mode 100644
+index 0000000..6a10cdd
+--- /dev/null
++++ b/backend/grails-app/domain/backend/Company.groovy
+@@ -0,0 +1,11 @@
++package backend
++
++class Company {
++    String name
++    String segment
++
++    static constraints = {
++        name nullable: false, blank: false, maxSize: 40
++        segment nullable: false, blank: false, maxSize: 20
++    }
++}
+diff --git a/backend/grails-app/init/backend/BootStrap.groovy b/backend/grails-app/init/backend/BootStrap.groovy
+index 73383a8..d101450 100644
+--- a/backend/grails-app/init/backend/BootStrap.groovy
++++ b/backend/grails-app/init/backend/BootStrap.groovy
+@@ -3,6 +3,9 @@ package backend
+ class BootStrap {
+ 
+     def init = { servletContext ->
++        new Company(name: 'Big Burgers', segment: 'Fast Food').save()
++        new Company(name: 'Easy Travel', segment: 'Tourism').save()
++        new Company(name: 'Wonder Team', segment: 'Sports').save()
+     }
+     def destroy = {
+     }
+diff --git a/backend/grails-app/services/backend/CompanyService.groovy b/backend/grails-app/services/backend/CompanyService.groovy
+new file mode 100644
+index 0000000..7c65f3b
+--- /dev/null
++++ b/backend/grails-app/services/backend/CompanyService.groovy
+@@ -0,0 +1,13 @@
++package backend
++
++import grails.gorm.transactions.Transactional
++
++@Transactional
++class CompanyService {
++
++    @Transactional
++    def getCompanies() {
++        return Company.list()
++    }
++
++}
+diff --git a/backend/src/test/groovy/backend/CompanyControllerSpec.groovy b/backend/src/test/groovy/backend/CompanyControllerSpec.groovy
+new file mode 100644
+index 0000000..d373a84
+--- /dev/null
++++ b/backend/src/test/groovy/backend/CompanyControllerSpec.groovy
+@@ -0,0 +1,18 @@
++package backend
++
++import grails.testing.web.controllers.ControllerUnitTest
++import spock.lang.Specification
++
++class CompanyControllerSpec extends Specification implements ControllerUnitTest<CompanyController> {
++
++    def setup() {
++    }
++
++    def cleanup() {
++    }
++
++    void "test something"() {
++        expect:"fix me"
++            true == false
++    }
++}
+diff --git a/backend/src/test/groovy/backend/CompanyServiceSpec.groovy b/backend/src/test/groovy/backend/CompanyServiceSpec.groovy
+new file mode 100644
+index 0000000..35e281a
+--- /dev/null
++++ b/backend/src/test/groovy/backend/CompanyServiceSpec.groovy
+@@ -0,0 +1,18 @@
++package backend
++
++import grails.testing.services.ServiceUnitTest
++import spock.lang.Specification
++
++class CompanyServiceSpec extends Specification implements ServiceUnitTest<CompanyService>{
++
++    def setup() {
++    }
++
++    def cleanup() {
++    }
++
++    void "test something"() {
++        expect:"fix me"
++            true == false
++    }
++}
+diff --git a/backend/src/test/groovy/backend/CompanySpec.groovy b/backend/src/test/groovy/backend/CompanySpec.groovy
+new file mode 100644
+index 0000000..b89bf98
+--- /dev/null
++++ b/backend/src/test/groovy/backend/CompanySpec.groovy
+@@ -0,0 +1,18 @@
++package backend
++
++import grails.testing.gorm.DomainUnitTest
++import spock.lang.Specification
++
++class CompanySpec extends Specification implements DomainUnitTest<Company> {
++
++    def setup() {
++    }
++
++    def cleanup() {
++    }
++
++    void "test something"() {
++        expect:"fix me"
++            true == false
++    }
++}
+diff --git a/frontend/angular.json b/frontend/angular.json
+index 8ad238e..986dade 100644
+--- a/frontend/angular.json
++++ b/frontend/angular.json
+@@ -110,5 +110,9 @@
+           }
+         }
+       }
+-    }}
++    }
++  },
++  "cli": {
++    "analytics": false
++  }
+ }
+\ No newline at end of file
+diff --git a/frontend/src/app/app.component.html b/frontend/src/app/app.component.html
+index bb548bb..46366ec 100644
+--- a/frontend/src/app/app.component.html
++++ b/frontend/src/app/app.component.html
+@@ -380,11 +380,10 @@
+   </div>
+ 
+   <!-- Next Steps -->
+-  <h2>Next Steps</h2>
+-  <p>You can do the <a href ='https://bitbucket.org/nitryx-team/rh-dev-1/wiki/Home#markdown-header-33-task-3' target="_blank">task #3</a> here</p>
+-
+-
+-
++  <!-- <h2>Next Steps</h2>
++  <p>You can do the <a href ='https://bitbucket.org/nitryx-team/rh-dev-1/wiki/Home#markdown-header-33-task-3' target="_blank">task #3</a> here</p> -->
+ 
++  <h1>TASKS METRYX</h1>
++  <CompanyComponent></CompanyComponent>
+ 
+ <router-outlet></router-outlet>
+diff --git a/frontend/src/app/app.module.ts b/frontend/src/app/app.module.ts
+index 2c3ba29..e04ef68 100644
+--- a/frontend/src/app/app.module.ts
++++ b/frontend/src/app/app.module.ts
+@@ -1,16 +1,22 @@
+ import { BrowserModule } from '@angular/platform-browser';
+ import { NgModule } from '@angular/core';
++import { HttpClientModule } from '@angular/common/http';
++import { FormsModule } from '@angular/forms';
+ 
+ import { AppRoutingModule } from './app-routing.module';
+ import { AppComponent } from './app.component';
++import { CompanyComponent } from './company.component';
+ 
+ @NgModule({
+   declarations: [
+-    AppComponent
++    AppComponent,
++    CompanyComponent
+   ],
+   imports: [
+     BrowserModule,
+-    AppRoutingModule
++    AppRoutingModule,
++    HttpClientModule,
++    FormsModule
+   ],
+   providers: [],
+   bootstrap: [AppComponent]
+diff --git a/frontend/src/app/company.component.html b/frontend/src/app/company.component.html
+new file mode 100644
+index 0000000..42f8003
+--- /dev/null
++++ b/frontend/src/app/company.component.html
+@@ -0,0 +1,22 @@
++<div class="container">
++    <input
++        type="text"
++        placeholder="Search here"
++        class="input-field"
++        [(ngModel)]="search"
++        (input)="filterCompanies()"
++    />
++    <button (click)="loadCompanies()" class="button-load">
++        Load Companies
++    </button>
++
++    <ul *ngIf="companies.length === 0">
++        No company loaded yet. Click the button!
++    </ul>
++
++    <ul *ngIf="companies.length > 0">
++        <li *ngFor="let company of filteredCompanies">
++            <strong>{{ company.name }}</strong> - {{ company.segment }}
++        </li>
++    </ul>
++</div>
+\ No newline at end of file
+diff --git a/frontend/src/app/company.component.scss b/frontend/src/app/company.component.scss
+new file mode 100644
+index 0000000..9072e93
+--- /dev/null
++++ b/frontend/src/app/company.component.scss
+@@ -0,0 +1,33 @@
++* {
++  padding: 0;
++  margin: 0;
++  box-sizing: border-box;
++}
++
++.container {
++  display: flex;
++  flex-direction: column;
++  margin-top: 1rem;
++  justify-content: center;
++  align-items: center;
++
++  button {
++    background-color: rgb(25, 118, 210);
++    margin: 1rem 0;
++    color: white;
++    padding: 0.75rem;
++    border-radius: 0.5rem;
++    border: none;
++    font-size: 1.2rem;
++
++    &:hover {
++      background-color: rgb(221, 0, 49);
++      cursor: pointer;
++    }
++  }
++
++  ul {
++    list-style: none;
++
++  }
++}
+\ No newline at end of file
+diff --git a/frontend/src/app/company.component.ts b/frontend/src/app/company.component.ts
+new file mode 100644
+index 0000000..091110b
+--- /dev/null
++++ b/frontend/src/app/company.component.ts
+@@ -0,0 +1,39 @@
++import { Component } from "@angular/core";
++import { CompanyService } from "./company.service";
++import { Company } from "./company.model";
++
++@Component({
++  selector: 'CompanyComponent',
++  templateUrl: './company.component.html',
++  styleUrls: ['./company.component.scss']
++})
++export class CompanyComponent {
++  
++  companies: Company[] = []
++  filteredCompanies: Company[] = []
++  search: String = ''
++
++  constructor(private companyService: CompanyService) {}
++
++  loadCompanies(): void {
++    this.companyService.getCompanies().subscribe(
++      (response: Company[]) => {
++        this.companies = response
++        this.filterCompanies()
++      },
++      error => {
++        console.error('Error: ', error)
++      }
++    )
++  }
++
++  filterCompanies(): void {
++    this.filteredCompanies = this.companies.filter(company => {
++      const name = company.name.toLocaleLowerCase()
++      const segment = company.name.toLocaleLowerCase()
++
++      return name.includes(this.search.toLowerCase()) || 
++      segment.includes(this.search.toLowerCase())
++    })
++  }
++}
+\ No newline at end of file
+diff --git a/frontend/src/app/company.model.ts b/frontend/src/app/company.model.ts
+new file mode 100644
+index 0000000..c5809d1
+--- /dev/null
++++ b/frontend/src/app/company.model.ts
+@@ -0,0 +1,4 @@
++export interface Company {
++    name: String,
++    segment: String
++}
+\ No newline at end of file
+diff --git a/frontend/src/app/company.service.spec.ts b/frontend/src/app/company.service.spec.ts
+new file mode 100644
+index 0000000..c9647b3
+--- /dev/null
++++ b/frontend/src/app/company.service.spec.ts
+@@ -0,0 +1,16 @@
++import { TestBed } from '@angular/core/testing';
++
++import { CompanyService } from './company.service';
++
++describe('CompanyService', () => {
++  let service: CompanyService;
++
++  beforeEach(() => {
++    TestBed.configureTestingModule({});
++    service = TestBed.inject(CompanyService);
++  });
++
++  it('should be created', () => {
++    expect(service).toBeTruthy();
++  });
++});
+diff --git a/frontend/src/app/company.service.ts b/frontend/src/app/company.service.ts
+new file mode 100644
+index 0000000..fd87906
+--- /dev/null
++++ b/frontend/src/app/company.service.ts
+@@ -0,0 +1,18 @@
++import { Injectable } from '@angular/core';
++import { HttpClient } from '@angular/common/http';
++import { Observable } from 'rxjs';
++import { Company } from './company.model';
++
++@Injectable({
++  providedIn: 'root'
++})
++export class CompanyService {
++
++  private url = 'http://localhost:8080/company/index'
++
++  constructor(private http: HttpClient) {}
++
++  getCompanies(): Observable<Company[]> {
++    return this.http.get<Company[]>(this.url)
++  }
++}

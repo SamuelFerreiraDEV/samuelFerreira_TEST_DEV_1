@@ -1,0 +1,22 @@
+<div class="container">
+    <input
+        type="text"
+        placeholder="Search here"
+        class="input-field"
+        [(ngModel)]="search"
+        (input)="filterCompanies()"
+    />
+    <button (click)="loadCompanies()" class="button-load">
+        Load Companies
+    </button>
+
+    <ul *ngIf="companies.length === 0">
+        No company loaded yet. Click the button!
+    </ul>
+
+    <ul *ngIf="companies.length > 0">
+        <li *ngFor="let company of filteredCompanies">
+            <strong>{{ company.name }}</strong> - {{ company.segment }}
+        </li>
+    </ul>
+</div>

@@ -1,5 +1,13 @@
 ---
 grails:
+    cors:
+        enabled: true
+        allowedOrigins:
+            - 'http://localhost:4200'
+        allowedMethods:
+            - GET
+        allowedHeaders:
+            - '*'
     profile: web
     codegen:
         defaultPackage: backend
